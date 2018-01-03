@@ -1,0 +1,22 @@
+﻿@page
+@using Microsoft.AspNetCore.Authentication;
+@model AboutModel
+@{
+    ViewData["Title"] = "About";
+}
+<h1>About Your Login</h1>
+
+<dl>
+    @foreach(var claim in User.Claims)
+    {
+        <dt>@claim.Type</dt>
+        <dd>@claim.Value</dd>
+    }
+    <dt>access token</dt>
+    <dd>@await ViewContext.HttpContext.GetTokenAsync("access_token")</dd>
+
+    <dt>refresh token</dt>
+    <dd>@await ViewContext.HttpContext.GetTokenAsync("refresh_token")</dd>
+</dl>
+<br />
+<a class="btn btn-default" href="/About?handler=logoff">Logoff</a>
