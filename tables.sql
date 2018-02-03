@@ -11,7 +11,7 @@
 
 CREATE TABLE [dbo].[Claim] (
     [id]             INT            IDENTITY (1, 1) NOT NULL,
-    [user_id]        INT            NOT NULL,
+    [AppUser_id]     INT            NOT NULL,
     [Issuer]         NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [OriginalIssuer] NVARCHAR (MAX) DEFAULT ('') NOT NULL,
     [Subject]        NVARCHAR (MAX) DEFAULT ('') NOT NULL,
