@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientWebApp", "IdentityServer4.AdoPersistence\ClientWebApp.csproj", "{430FC6B1-A3C2-4512-B559-DE37919453CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientWebApp", "IdentityServer4.AdoPersistence\ClientWebApp.csproj", "{430FC6B1-A3C2-4512-B559-DE37919453CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{FC814B6D-7142-4B80-A77F-2A9F6D9C69DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{FC814B6D-7142-4B80-A77F-2A9F6D9C69DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Certs", "Certs", "{4184CA01-7743-4DC3-8AC1-C59E8B8E8B14}"
+	ProjectSection(SolutionItems) = preProject
+		identitycertpkcs.pfx = identitycertpkcs.pfx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

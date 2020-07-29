@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityServer4.Quickstart.UI
+namespace IdentityServer.Quickstart.Diagnostics
 {
     [SecurityHeaders]
     [Authorize]
