@@ -3,6 +3,7 @@
 
 
 using System.Threading.Tasks;
+using IdentityServer4.Quickstart.UI;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Mvc;
 
