@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
+using IdentityModel;
+using IdentityServer.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-
 using IdentityServer4;
 using IdentityServer4.Stores;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityServer
 {
@@ -18,16 +18,25 @@ namespace IdentityServer
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc((options => options.EnableEndpointRouting = false));
 
             services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
+                .AddSigningCredential(GetIdServerCertificate())
+                //.AddDeveloperSigningCredential()
                 .AddInMemoryClients(ConfigureIdentityServer.GetClients())
                 .AddInMemoryIdentityResources(ConfigureIdentityServer.GetIdentityResources())
                 .AddProfileService<UserProfileService>();
 
-            services.AddSingleton<IUserStore, UserStore>();
+            services.AddSingleton(sp =>
+            {
+                var config = TelemetryConfiguration.CreateDefault();
 
+                config.DisableTelemetry = true;
+
+                return config;
+            });
+
+            services.AddSingleton<IUserStore, UserStore>();
             services.AddTransient<IPersistedGrantStore, PersistedGrantStore>();
 
             services.AddAuthentication()
@@ -39,22 +48,24 @@ namespace IdentityServer
                 });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public static X509Certificate2 GetIdServerCertificate()
+        {
+            using var rsaCertStore = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
+            rsaCertStore.Open(OpenFlags.ReadOnly);
+            return rsaCertStore.Certificates.Find(X509FindType.FindBySubjectName, "identitycertpkcs", true)[0];
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if(env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                try
-                {
-                    var configuration = app.ApplicationServices.GetService<TelemetryConfiguration>();
-                    configuration.DisableTelemetry = true;
-                }
-                catch { }
             }
 
             app.UseIdentityServer(); // includes a call to UseAuthentication
-
+            app.UseRouting();
+            //app.UseAuthentication();
+            app.UseAuthorization();
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
         }

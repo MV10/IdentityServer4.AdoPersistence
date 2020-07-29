@@ -2,23 +2,25 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using IdentityModel;
-using IdentityServer4.Services;
-using IdentityServer4.Stores;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using IdentityModel;
+using IdentityServer.Persistence;
+using IdentityServer4;
 using IdentityServer4.Events;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
+using IdentityServer4.Services;
+using IdentityServer4.Stores;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityServer4.Quickstart.UI
+namespace IdentityServer.Quickstart.Account
 {
     /// <summary>
     /// This sample controller implements a typical login/logout/provision workflow for local and external accounts.
@@ -81,7 +83,10 @@ namespace IdentityServer4.Quickstart.UI
                     // if the user cancels, send a result back into IdentityServer as if they 
                     // denied the consent (even if this client does not require consent).
                     // this will send back an access denied OIDC error response to the client.
-                    await _interaction.GrantConsentAsync(context, ConsentResponse.Denied);
+                    await _interaction.GrantConsentAsync(context, new ConsentResponse
+                    {
+                        Error = AuthorizationError.AccessDenied
+                    });
                     
                     // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
                     return Redirect(model.ReturnUrl);
@@ -114,7 +119,8 @@ namespace IdentityServer4.Quickstart.UI
                     };
 
                     // issue authentication cookie with subject ID and username
-                    await HttpContext.SignInAsync(user.SubjectId, user.Username, props);
+                    //user.SubjectId, user.Username, props
+                    await HttpContext.SignInAsync(user.SubjectId, ClaimsPrincipal.Current);
 
                     // make sure the returnUrl is still valid, and if so redirect back to authorize endpoint or a local page
                     if (_interaction.IsValidReturnUrl(model.ReturnUrl) || Url.IsLocalUrl(model.ReturnUrl))
@@ -266,7 +272,8 @@ namespace IdentityServer4.Quickstart.UI
 
             // issue authentication cookie for user
             await _events.RaiseAsync(new UserLoginSuccessEvent(provider, userId, user.SubjectId, user.Username));
-            await HttpContext.SignInAsync(user.SubjectId, user.Username, provider, props, additionalClaims.ToArray());
+            //user.SubjectId, user.Username, provider, props, additionalClaims.ToArray()
+            await HttpContext.SignInAsync(new IdentityServerUser(user.SubjectId));
 
             // delete temporary cookie used during external authentication
             await HttpContext.SignOutAsync(IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme);

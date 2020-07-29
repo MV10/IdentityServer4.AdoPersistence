@@ -19,12 +19,23 @@ namespace IdentityServer
                 new IdentityResource(
                     name: "mv10blog.identity",
                     displayName: "MV10 Blog User Profile",
-                    claimTypes: new[] { "mv10_accounttype" })
+                    new[] { "mv10_accounttype" })
             };
         }
 
+        static string[] allowedScopes =
+        {
+            IdentityServerConstants.StandardScopes.OpenId,
+            IdentityServerConstants.StandardScopes.Profile,
+            IdentityServerConstants.StandardScopes.Email,
+            "resource1.scope1",
+            "resource2.scope1",
+            "transaction"
+        };
+
         public static IEnumerable<Client> GetClients()
         {
+            var secret = "the_secret".Sha256();
             return new List<Client>
             {
                 new Client
@@ -32,10 +43,11 @@ namespace IdentityServer
                     ClientId = "mv10blog.client",
                     ClientName = "McGuireV10.com",
                     ClientUri = "http://localhost:5002",
-                    AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
-                    ClientSecrets = {new Secret("the_secret".Sha256())},
+                    AllowedGrantTypes = GrantTypes.Code,
+                    ClientSecrets = {new Secret(secret)},
                     AllowRememberConsent = true,
                     AllowOfflineAccess = true,
+                    RequirePkce = true,
                     RedirectUris = { "http://localhost:5002/signin-oidc"}, // after login
                     PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc"}, // after logout
                     AllowedScopes = new List<string>
@@ -47,7 +59,31 @@ namespace IdentityServer
                         IdentityServerConstants.StandardScopes.Address,
                         "mv10blog.identity"
                     }
-                }
+                },
+                new Client
+                {
+                    ClientId = "mvc.code",
+                    ClientName = "MVC Code Flow",
+                    ClientUri = "http://identityserver.io",
+
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+
+                    RequireConsent = true,
+                    RequirePkce = true,
+                    AllowedGrantTypes = GrantTypes.Code,
+
+                    RedirectUris = { "https://localhost:44302/signin-oidc" },
+                    FrontChannelLogoutUri = "https://localhost:44302/signout-oidc",
+                    PostLogoutRedirectUris = { "https://localhost:44302/signout-callback-oidc" },
+
+                    AllowOfflineAccess = true,
+
+                    AllowedScopes = allowedScopes
+                },
+
             };
         }
     }
